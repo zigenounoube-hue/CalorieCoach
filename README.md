@@ -21,6 +21,14 @@ Transfère CalorieCoach.apk sur ton téléphone Android, ouvre le fichier, puis 
 
 Les appels IA utilisent Firebase AI Logic et nécessitent Internet. Les photos de repas envoyées sont transmises à Gemini pour estimation; les résultats restent approximatifs et ne remplacent pas un avis médical. Le projet Firebase utilise Firestore en Europe, avec des règles qui limitent l’accès aux données au compte connecté.
 
-Cette APK est une version de débogage personnelle. App Check utilise le fournisseur de débogage pour Gemini; Firebase demande d’enregistrer le jeton de débogage de l’appareil avant d’autoriser ses requêtes IA. Pour une diffusion publique, générer une version de production et configurer Play Integrity.
+Cette APK reste signée avec la clé de développement personnelle pour conserver la compatibilité des mises à jour. Depuis la version 1.1.2, elle utilise Play Integrity pour App Check, y compris dans l’APK installable de développement. Le fournisseur de débogage est réservé à une compilation locale explicite avec `-PappCheckDebug=true` ; ne jamais publier ces builds ni leurs jetons.
+
+Le projet doit activer l’API Google Play Integrity et enregistrer l’application Android dans Firebase App Check avec le SHA-256 du certificat qui signe l’APK. Pour une distribution exclusivement hors Google Play, les réglages Firebase recommandés sont : `PLAY_RECOGNIZED` non requis, `LICENSED` non requis, intégrité de l’appareil requise. Aucun contrôle App Check n’est désactivé par le code. Un appareil modifié ou non certifié peut être refusé.
+
+La version 1.1.3 utilise Gemini 3.5 Flash-Lite puis Gemini 3.8 Flash en secours uniquement en cas de panne temporaire ou de délai dépassé. Les refus d’accès et quotas sont signalés sans boucle de nouvelles tentatives. Les photos sont des estimations, pas des mesures nutritionnelles exactes.
+
+## Validation sur Android
+
+Les résultats des essais sur le téléphone physique sont décrits dans [AI_VALIDATION.md](AI_VALIDATION.md). Le test d’intégration n’est pas inclus dans l’APK de l’application. Pour le lancer sur un appareil de développement autorisé : compiler `assembleDebug assembleDebugAndroidTest`, installer les deux APK puis exécuter `adb shell am instrument -w -e suite true fr.caloriecoach.app.test/fr.caloriecoach.app.AiDiagnostics`. Il utilise des données fictives et ne lit pas le profil ni l’historique réels.
 
 Pour activer la vérification des mises à jour, indique dans Réglages le dépôt GitHub au format `propriétaire/projet`. Chaque publication GitHub doit inclure son tag de version, ses notes et l’APK signé. Android demandera l’autorisation d’installation à l’utilisateur. Voir [CHANGELOG.md](CHANGELOG.md).

@@ -10,10 +10,12 @@ android {
     compileSdk = 35
     defaultConfig {
         applicationId = "fr.caloriecoach.app"
+        testInstrumentationRunner = "fr.caloriecoach.app.AiDiagnostics"
+        buildConfigField("boolean", "APP_CHECK_DEBUG", providers.gradleProperty("appCheckDebug").orElse("false").get())
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.1.0"
+        versionCode = 5
+        versionName = "1.1.3"
         buildConfigField("String", "GEMINI_API_KEY", "\"\"")
     }
     compileOptions {
@@ -42,3 +44,4 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
     implementation("androidx.work:work-runtime-ktx:2.10.0")
 }
+

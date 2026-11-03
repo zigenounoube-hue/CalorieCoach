@@ -25,7 +25,7 @@ object CoachChatStore {
             (if (m.user) "Utilisateur : " else "Coach : ") + m.text.take(900)
         }
         val instruction = "Tu es le coach personnel de fitness et de nutrition de l’utilisateur. Réponds en français, clairement, avec bienveillance et sans prétendre remplacer un professionnel de santé. " +
-            "Utilise le profil, l’historique et le journal fournis pour personnaliser tes réponses. Les calories sont approximatives. Évite les régimes extrêmes et les diagnostics. " +
+            "Utilise le profil, l’historique et le journal fournis pour personnaliser tes réponses. Réponds sans Markdown, en moins de 180 mots sauf si une séance détaillée est demandée. Les calories sont approximatives. Évite les régimes extrêmes et les diagnostics. " +
             "Profil et contexte actuel : $profileContext\nConversation récente :\n$history"
         return GeminiFoodEstimator.generateText(messages.last().text, instruction)
     }
