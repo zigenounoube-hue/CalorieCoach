@@ -1,5 +1,15 @@
 # Journal des mises à jour
 
+## 1.2.0 — thèmes et repas décrits
+
+- Cinq ambiances sélectionnables dans Réglages : Minuit, Forêt, Océan, Crépuscule et Aube (clair). La palette est appliquée à toute l'application et mémorisée sur l'appareil.
+- La description d'un repas peut être envoyée seule à l'IA pour estimer ses calories. La photo reste facultative.
+- Suppression de la valeur automatique de 450 kcal. Une estimation valide ou une saisie manuelle explicite est nécessaire pour enregistrer un repas.
+- Les calories restent modifiables. Changer la description ou la photo annule l'ancienne estimation pour éviter une valeur périmée.
+- Suppression de l'encart de connexion technique dans Réglages.
+- Dépôt GitHub visible en lecture seule, source officielle fixe pour les vérifications de mises à jour.
+- Notes de version disponibles dans l'app, même hors ligne, à la place du bouton de simulation.
+
 ## 1.1.3 — 3 novembre 2026
 
 - App Check enregistré avec Play Integrity et API Google Play Integrity activée pour les APK distribuées hors Google Play.

@@ -11,12 +11,18 @@ import kotlinx.coroutines.withTimeout
 /** Explicit, on-device integration probe. Never reads the user's profile or chat. */
 class AiDiagnostics : Instrumentation() {
     private var suite = false
-    override fun onCreate(arguments: Bundle?) { super.onCreate(arguments); suite = arguments?.getString("suite") == "true"; start() }
+    private var features = false
+    override fun onCreate(arguments: Bundle?) { super.onCreate(arguments); suite = arguments?.getString("suite") == "true"; features=arguments?.getString("features")=="true"; start() }
     override fun onStart() {
         com.google.firebase.FirebaseApp.initializeApp(targetContext)
         FirebaseAppCheck.getInstance().installAppCheckProviderFactory(
             com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory.getInstance()
         )
+        if(features) {
+            val report=FeatureDiagnostics(this).run()
+            finish(if(report.contains("FAILURES=0")) -1 else 1,Bundle().apply {putString("stream",report)})
+            return
+        }
         val report = StringBuilder()
         var failures = 0
         fun record(value: String) {
@@ -72,6 +78,17 @@ class AiDiagnostics : Instrumentation() {
                     bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG,85,out)
                     GeminiFoodEstimator.estimate("",out.toByteArray(),"Image de test illustrée : une banane moyenne, environ 120 g de chair, sans autre aliment.")
                         .also { check(it.second in 50..250) }.toString()
+                }
+                val descriptions=listOf("Une pomme crue de 150 g, sans autre aliment", "250 ml d’eau plate, sans sucre ni sirop", "200 g de riz cuit, 150 g de poulet grillé et 15 g d’huile d’olive")
+                val ranges=listOf(50..140,0..5,450..900)
+                descriptions.forEachIndexed { index, description ->
+                    probe("MEAL_TEXT_$index") {
+                        GeminiFoodEstimator.estimateMealDescription(description).also { check(it.second in ranges[index]) { "Estimation hors plage pour le cas $index : ${it.second}" } }.toString()
+                    }
+                }
+                probe("MEAL_TEXT_EMPTY") {
+                    check(runCatching { GeminiFoodEstimator.estimateMealDescription("   ") }.exceptionOrNull() is IllegalArgumentException)
+                    "Entrée vide refusée sans appel réseau"
                 }
             }
         }

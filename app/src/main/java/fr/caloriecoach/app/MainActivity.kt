@@ -64,20 +64,20 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 
-private val Ink = Color(0xFFE7F0F2)
-private val Green = Color(0xFF94C9B2)
-private val OnGreen = Color(0xFF121811)
-private val Accent = Color(0xFFABBAE8)
-private val Paper = Color(0xFF0B1018)
-private val Muted = Color(0xFF8D9BA2)
-private val Panel = Color(0xFF141D29)
-private val PanelRaised = Color(0xFF1B2735)
-private val Border = Color(0xFF2A394A)
+private val Ink: Color @Composable get() = MaterialTheme.colorScheme.onBackground
+private val Green: Color @Composable get() = MaterialTheme.colorScheme.primary
+private val OnGreen: Color @Composable get() = MaterialTheme.colorScheme.onPrimary
+private val Accent: Color @Composable get() = MaterialTheme.colorScheme.secondary
+private val Paper: Color @Composable get() = MaterialTheme.colorScheme.background
+private val Muted: Color @Composable get() = MaterialTheme.colorScheme.onSurfaceVariant
+private val Panel: Color @Composable get() = MaterialTheme.colorScheme.surface
+private val PanelRaised: Color @Composable get() = MaterialTheme.colorScheme.surfaceVariant
+private val Border: Color @Composable get() = MaterialTheme.colorScheme.outline
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { MaterialTheme(colorScheme = darkColorScheme(primary = Green, onPrimary = Paper, secondary = Accent, background = Paper, onBackground = Ink, surface = Panel, onSurface = Ink, surfaceVariant = PanelRaised, onSurfaceVariant = Muted, outline = Border)) { CoachApp() } }
+        setContent { CoachThemeRoot { CoachApp() } }
     }
 }
 
@@ -143,7 +143,7 @@ private fun CoachApp() {
             }
         }
     }) { pad ->
-        AnimatedContent(targetState=tab, modifier=Modifier.padding(pad).background(Brush.verticalGradient(listOf(Paper, Color(0xFF0B151A))), RoundedCornerShape(0.dp)), transitionSpec={ fadeIn(tween(220)) + slideInVertically(tween(220)){it/24} togetherWith fadeOut(tween(140)) }, label="tab-transition") { selected ->
+        AnimatedContent(targetState=tab, modifier=Modifier.padding(pad).background(Brush.verticalGradient(listOf(Paper, Panel)), RoundedCornerShape(0.dp)), transitionSpec={ fadeIn(tween(220)) + slideInVertically(tween(220)){it/24} togetherWith fadeOut(tween(140)) }, label="tab-transition") { selected ->
             when(selected) {
                 0 -> Dashboard(Modifier.fillMaxSize(), eaten, burned, effectiveTarget, items, onFood={showFood=true}, onWorkout={showWorkout=true}, onPlan={showPlan=true})
                 1 -> Journal(Modifier.fillMaxSize(), items, onFood={showFood=true}, onWorkout={showWorkout=true})
@@ -190,9 +190,9 @@ private fun CoachApp() {
         items(items.take(4).size) { i -> LogRow(items[i]) }
     }
 }
-@Composable private fun Stat(label:String,value:String,sub:String){Column {Text(label,color=Color.White.copy(.55f),fontSize=10.sp,fontWeight=FontWeight.Bold,letterSpacing=1.sp);Text("$value kcal",color=Color.White,fontWeight=FontWeight.Bold,fontSize=18.sp);Text(sub,color=Color.White.copy(.55f),fontSize=11.sp)}}
+@Composable private fun Stat(label:String,value:String,sub:String){Column {Text(label,color=Muted,fontSize=10.sp,fontWeight=FontWeight.Bold,letterSpacing=1.sp);Text("$value kcal",color=Ink,fontWeight=FontWeight.Bold,fontSize=18.sp);Text(sub,color=Muted,fontSize=11.sp)}}
 @Composable private fun ActionTile(text:String, icon: androidx.compose.ui.graphics.vector.ImageVector, modifier:Modifier, click:()->Unit){Card(onClick=click,modifier=modifier.height(112.dp).animateContentSize().shadow(6.dp,RoundedCornerShape(18.dp),ambientColor=Green.copy(alpha=.04f)),colors=CardDefaults.cardColors(containerColor=Panel),shape=RoundedCornerShape(18.dp),border=androidx.compose.foundation.BorderStroke(1.dp,Border)){Column(Modifier.fillMaxSize().padding(14.dp),verticalArrangement=Arrangement.SpaceBetween){Icon(icon,null,tint=Ink);Text(text,color=Ink,fontWeight=FontWeight.SemiBold,fontSize=13.sp)}}}
-@Composable private fun LogRow(item:LogItem){Card(colors=CardDefaults.cardColors(containerColor=Panel),shape=RoundedCornerShape(17.dp),border=androidx.compose.foundation.BorderStroke(1.dp,Border)){Row(Modifier.fillMaxWidth().padding(14.dp),verticalAlignment=Alignment.CenterVertically){Box(Modifier.size(42.dp).background(if(item.food)Color(0xFF3A2B20) else Color(0xFF213329),CircleShape),contentAlignment=Alignment.Center){Icon(if(item.food)Icons.Default.Restaurant else Icons.Default.DirectionsRun,null,tint=Ink)};Column(Modifier.weight(1f).padding(start=12.dp)){Text(item.title,color=Ink,fontWeight=FontWeight.SemiBold,fontSize=14.sp);Text(item.subtitle,color=Muted,fontSize=11.sp)};Text("${if(item.food)"+" else "−"}${item.kcal}",color=Ink,fontWeight=FontWeight.Bold,fontSize=14.sp)}}}
+@Composable private fun LogRow(item:LogItem){Card(colors=CardDefaults.cardColors(containerColor=Panel),shape=RoundedCornerShape(17.dp),border=androidx.compose.foundation.BorderStroke(1.dp,Border)){Row(Modifier.fillMaxWidth().padding(14.dp),verticalAlignment=Alignment.CenterVertically){Box(Modifier.size(42.dp).background(if(item.food)Green.copy(alpha=.16f) else Accent.copy(alpha=.16f),CircleShape),contentAlignment=Alignment.Center){Icon(if(item.food)Icons.Default.Restaurant else Icons.Default.DirectionsRun,null,tint=Ink)};Column(Modifier.weight(1f).padding(start=12.dp)){Text(item.title,color=Ink,fontWeight=FontWeight.SemiBold,fontSize=14.sp);Text(item.subtitle,color=Muted,fontSize=11.sp)};Text("${if(item.food)"+" else "−"}${item.kcal}",color=Ink,fontWeight=FontWeight.Bold,fontSize=14.sp)}}}
 
 @Composable private fun Journal(modifier:Modifier,items:List<LogItem>,onFood:()->Unit,onWorkout:()->Unit){LazyColumn(modifier.fillMaxSize(),contentPadding=PaddingValues(22.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){item{Text("Ton journal",fontSize=28.sp,fontWeight=FontWeight.Bold,color=Ink);Text(java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("EEEE d MMMM", java.util.Locale.FRENCH)).replaceFirstChar{it.uppercase()} + " · suivi du jour",color=Muted)};item{Row(horizontalArrangement=Arrangement.spacedBy(10.dp)){Button(onClick=onFood){Text("+ Repas")}; OutlinedButton(onClick=onWorkout){Text("+ Séance")}}};items(items.size){LogRow(items[it])}}}
 @Composable private fun Plans(modifier:Modifier,savedPlan:String,onPlan:()->Unit){Column(modifier.fillMaxSize().padding(22.dp).verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(16.dp)){Text("Programmes",fontSize=28.sp,fontWeight=FontWeight.Bold,color=Ink);Text("Un plan évolutif adapté à ton profil.",color=Muted);Card(colors=CardDefaults.cardColors(containerColor=Panel),shape=RoundedCornerShape(22.dp),border=androidx.compose.foundation.BorderStroke(1.dp,Border)){Column(Modifier.fillMaxWidth().padding(20.dp)){Text(if(savedPlan.isBlank())"TON COACH IA" else "TON PROGRAMME",fontSize=10.sp,fontWeight=FontWeight.Bold,color=Green,letterSpacing=1.2.sp);Spacer(Modifier.height(9.dp));Text(if(savedPlan.isBlank())"Crée une routine qui te ressemble" else savedPlan,fontSize=15.sp,fontWeight=if(savedPlan.isBlank())FontWeight.Bold else FontWeight.Normal,color=Ink,lineHeight=22.sp);Spacer(Modifier.height(14.dp));Button(onClick=onPlan,modifier=Modifier.fillMaxWidth()){Text(if(savedPlan.isBlank())"Créer mon programme avec l’IA" else "Régénérer mon programme")}}};Text("Le programme est une suggestion à adapter à tes sensations et à ton niveau.",color=Muted,fontSize=12.sp)}}
@@ -207,96 +207,16 @@ private fun CoachApp() {
     val dayOptions=listOf("Lun" to 2,"Mar" to 3,"Mer" to 4,"Jeu" to 5,"Ven" to 6,"Sam" to 7,"Dim" to 1)
     Column(modifier.fillMaxSize().padding(22.dp).verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(14.dp)) {
         Text("Réglages",fontSize=28.sp,fontWeight=FontWeight.Bold,color=Ink)
+        ThemeSettingsCard()
         Card(colors=CardDefaults.cardColors(containerColor=Panel),shape=RoundedCornerShape(20.dp),border=androidx.compose.foundation.BorderStroke(1.dp,Border)){Column(Modifier.fillMaxWidth().padding(18.dp),verticalArrangement=Arrangement.spacedBy(9.dp)){Text("Compte et sauvegarde",fontWeight=FontWeight.Bold,color=Ink);if(signedInEmail.isNotBlank()){Text("Connecté en tant que $signedInEmail",color=Muted,fontSize=12.sp);Text("Ton profil, ton journal et ta conversation sont synchronisés dans ton espace privé.",color=Muted,fontSize=12.sp);OutlinedButton(onClick=onSignOut,enabled=!accountBusy){Text("Se déconnecter")}}else{Text("Crée un compte ou connecte-toi pour retrouver tes données sur un autre appareil.",color=Muted,fontSize=12.sp);OutlinedTextField(accountEmail,{accountEmail=it},label={Text("Adresse e-mail")},singleLine=true,modifier=Modifier.fillMaxWidth());OutlinedTextField(accountPassword,{accountPassword=it},label={Text("Mot de passe")},singleLine=true,visualTransformation=androidx.compose.ui.text.input.PasswordVisualTransformation(),modifier=Modifier.fillMaxWidth());Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){Button(enabled=!accountBusy&&accountEmail.contains("@")&&accountPassword.length>=6,onClick={onAccountSubmit(accountEmail,accountPassword,true)}){Text(if(accountBusy)"Patiente…" else "Créer un compte")};OutlinedButton(enabled=!accountBusy&&accountEmail.contains("@")&&accountPassword.isNotBlank(),onClick={onAccountSubmit(accountEmail,accountPassword,false)}){Text("Connexion")}}};if(accountMessage.isNotBlank())Text(accountMessage,color=if(accountMessage.contains("impossible")||accountMessage.contains("erreur"))MaterialTheme.colorScheme.error else Green,fontSize=12.sp)}}
         Card(colors=CardDefaults.cardColors(containerColor=Panel),shape=RoundedCornerShape(20.dp)){Column(Modifier.padding(18.dp)){Text("Ton profil",fontWeight=FontWeight.Bold,color=Ink);Spacer(Modifier.height(8.dp));Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){OutlinedTextField(age,onAge,label={Text("Âge")},suffix={Text("ans")},modifier=Modifier.weight(1f),singleLine=true);OutlinedTextField(height,onHeight,label={Text("Taille")},suffix={Text("cm")},modifier=Modifier.weight(1f),singleLine=true)};OutlinedTextField(weight,onWeight,label={Text("Poids")},suffix={Text("kg")},modifier=Modifier.fillMaxWidth(),singleLine=true);Text("Objectif",color=Muted,fontSize=12.sp);Row(horizontalArrangement=Arrangement.spacedBy(5.dp)){listOf("Perte de poids","Maintien","Prise de muscle").forEach{FilterChip(selected=goal==it,onClick={onGoal(it)},label={Text(it,fontSize=11.sp)})}};Text("Formule de calcul",color=Muted,fontSize=12.sp);Row(horizontalArrangement=Arrangement.spacedBy(5.dp)){listOf("Femme","Homme","Moyenne").forEach{FilterChip(selected=sex==it,onClick={onSex(it)},label={Text(it,fontSize=11.sp)})}};Text("Activité habituelle hors séances",color=Muted,fontSize=12.sp);Column { listOf("Sédentaire","Léger","Modéré","Très actif").chunked(2).forEach{row->Row(horizontalArrangement=Arrangement.spacedBy(5.dp)){row.forEach{FilterChip(selected=activityLevel==it,onClick={onActivity(it)},label={Text(it,fontSize=11.sp)})}}} }}}
         Card(colors=CardDefaults.cardColors(containerColor=Panel),shape=RoundedCornerShape(20.dp)){Column(Modifier.padding(18.dp)){Text("Objectif calories quotidien",fontWeight=FontWeight.Bold,color=Ink);Text("$target kcal",fontSize=24.sp,color=Ink);Text(suggestion?.let{"Entretien estimé : ${it.maintenance} kcal · suggestion ajustable"} ?: "Complète âge, taille, poids, sexe et activité pour obtenir une estimation.",fontSize=11.sp,color=Muted);if(suggestion!=null)TextButton(onClick=onResetTarget){Text("Revenir à la suggestion")};Slider(value=target.toFloat(),onValueChange={onTarget((it/50).toInt()*50)},valueRange=1200f..3500f,steps=45,colors=SliderDefaults.colors(thumbColor=Ink,activeTrackColor=Green))}}
         Card(colors=CardDefaults.cardColors(containerColor=Panel),shape=RoundedCornerShape(20.dp),border=androidx.compose.foundation.BorderStroke(1.dp,Border)){Column(Modifier.fillMaxWidth().padding(18.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){Row(verticalAlignment=Alignment.CenterVertically){Icon(Icons.Default.NotificationsActive,null,tint=Green);Column(Modifier.weight(1f).padding(start=12.dp)){Text("Rappels de séance",fontWeight=FontWeight.Bold,color=Ink);Text("Choisis tes jours et ton heure",color=Muted,fontSize=12.sp)};Switch(checked=remindersEnabled,onCheckedChange={enabled->if(enabled&&Build.VERSION.SDK_INT>=33&&androidx.core.content.ContextCompat.checkSelfPermission(context,android.Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED)permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS) else {permissionDenied=false;onReminderUpdate(enabled,reminderDays,reminderHour,reminderMinute)}})};Row(horizontalArrangement=Arrangement.spacedBy(8.dp),verticalAlignment=Alignment.CenterVertically){Text("Heure",color=Muted,fontSize=12.sp);OutlinedButton(onClick={showTimePicker=true}){Text(String.format(java.util.Locale.getDefault(),"%02d:%02d",reminderHour,reminderMinute),color=Ink)}};Row(horizontalArrangement=Arrangement.spacedBy(3.dp)){dayOptions.take(4).forEach{(label,day)->FilterChip(selected=day in reminderDays,onClick={val next=if(day in reminderDays)reminderDays-day else reminderDays+day;onReminderUpdate(remindersEnabled,next,reminderHour,reminderMinute)},label={Text(label,fontSize=10.sp)})}};Row(horizontalArrangement=Arrangement.spacedBy(3.dp)){dayOptions.drop(4).forEach{(label,day)->FilterChip(selected=day in reminderDays,onClick={val next=if(day in reminderDays)reminderDays-day else reminderDays+day;onReminderUpdate(remindersEnabled,next,reminderHour,reminderMinute)},label={Text(label,fontSize=10.sp)})}};if(permissionDenied)Text("Autorise les notifications Android pour recevoir tes rappels.",color=MaterialTheme.colorScheme.error,fontSize=11.sp)}}
-        Card(colors=CardDefaults.cardColors(containerColor=Panel),shape=RoundedCornerShape(20.dp),border=androidx.compose.foundation.BorderStroke(1.dp,Border)){Column(Modifier.padding(18.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){Text("Assistant Gemini",fontWeight=FontWeight.Bold,color=Ink);Text("Connecté via Firebase AI Logic. Aucune clé API personnelle n’est affichée dans l’application. Les photos de repas envoyées pour estimation sont traitées par Gemini.",color=Muted,fontSize=12.sp,lineHeight=18.sp)}}
         ReleaseUpdateCard()
     }
     if(showTimePicker){val timeState=rememberTimePickerState(initialHour=reminderHour,initialMinute=reminderMinute,is24Hour=true);AlertDialog(onDismissRequest={showTimePicker=false},title={Text("Heure du rappel")},text={TimePicker(state=timeState)},confirmButton={Button(onClick={onReminderUpdate(remindersEnabled,reminderDays,timeState.hour,timeState.minute);showTimePicker=false}){Text("Valider")}},dismissButton={TextButton(onClick={showTimePicker=false}){Text("Annuler")}})}
 }
 
-@Composable private fun ReleaseUpdateCard() {
-    val context = LocalContext.current
-    val preferences = remember { context.getSharedPreferences("app_updates", 0) }
-    val scope = rememberCoroutineScope()
-    var repository by remember { mutableStateOf(preferences.getString("repository", "zigenounoube-hue/CalorieCoach") ?: "zigenounoube-hue/CalorieCoach") }
-    var status by remember { mutableStateOf("") }
-    var busy by remember { mutableStateOf(false) }
-    var release by remember { mutableStateOf<AppRelease?>(null) }
-    var showRelease by remember { mutableStateOf(false) }
-    var simulationStep by remember { mutableIntStateOf(0) }
-    val localVersion = remember { runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "1.0" }.getOrDefault("1.0") }
-
-    Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(20.dp), border = androidx.compose.foundation.BorderStroke(1.dp, Border)) {
-        Column(Modifier.fillMaxWidth().padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Mises à jour", fontWeight = FontWeight.Bold, color = Ink)
-            Text("V$localVersion · Consulte les nouveautés et télécharge les versions publiées sur GitHub.", color = Muted, fontSize = 12.sp)
-            OutlinedTextField(repository, { repository = it }, label = { Text("Dépôt GitHub · propriétaire/projet") }, placeholder = { Text("ex. zigen/CalorieCoach") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-            Button(enabled = !busy && repository.isNotBlank(), onClick = {
-                busy = true
-                status = "Vérification en cours…"
-                preferences.edit().putString("repository", repository.trim()).apply()
-                scope.launch {
-                    try {
-                        val found = ReleaseUpdater.latest(repository)
-                        release = found
-                        if (ReleaseUpdater.isNewer(found.version, localVersion)) {
-                            status = "Nouvelle version disponible : ${found.version}"
-                            showRelease = true
-                        } else status = "Tu utilises déjà la dernière version publiée (${found.version})."
-                    } catch (error: Exception) {
-                        status = error.localizedMessage ?: "Impossible de vérifier les mises à jour."
-                    } finally { busy = false }
-                }
-            }, modifier = Modifier.fillMaxWidth()) { Text(if (busy) "Vérification…" else "Vérifier les mises à jour") }
-            OutlinedButton(onClick = { simulationStep = 1 }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text("Simuler une mise à jour") }
-            if (status.isNotBlank()) Text(status, color = if (status.startsWith("Impossible") || status.startsWith("Saisis") || status.startsWith("GitHub")) MaterialTheme.colorScheme.error else Muted, fontSize = 12.sp)
-            Text("Les APK téléchargés sont installés avec l’autorisation Android habituelle.", color = Muted, fontSize = 11.sp)
-        }
-    }
-    if (simulationStep > 0) {
-        AlertDialog(
-            onDismissRequest = { simulationStep = 0 },
-            title = { Text(if (simulationStep == 1) "Nouvelle version · démo" else "Simulation terminée") },
-            text = { Text(if (simulationStep == 1)
-                "SIMULATION — version fictive 1.1.2\n\nNouveautés\n• Nouveau tableau de bord sombre\n• Anneau de calories animé\n• Messages d’erreur IA plus clairs\n\nCette démonstration ne télécharge aucun fichier et ne modifie pas ton application."
-                else "Le parcours de notification fonctionne dans cette démonstration.\n\nUne vraie mise à jour nécessite une APK publiée, téléchargée puis confirmée dans l’installateur Android. Cette étape n’a pas été testée ici.") },
-            confirmButton = { TextButton(onClick = { if (simulationStep == 1) simulationStep = 2 else simulationStep = 0 }) { Text(if (simulationStep == 1) "Tester la suite" else "Terminer") } },
-            dismissButton = { if (simulationStep == 1) TextButton(onClick = { simulationStep = 0 }) { Text("Plus tard") } }
-        )
-    }
-    if (showRelease) {
-        val found = release
-        AlertDialog(
-            onDismissRequest = { showRelease = false },
-            title = { Text("Mise à jour ${found?.version.orEmpty()}") },
-            text = { Text(found?.notes.orEmpty(), color = Ink, modifier = Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) },
-            confirmButton = { TextButton(onClick = {
-                showRelease = false
-                val url = found?.apkUrl ?: found?.releasePage
-                if (!url.isNullOrBlank()) runCatching { context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, Uri.parse(url))) }
-            }) { Text(if (found?.apkUrl != null) "Télécharger l’APK" else "Ouvrir la publication") } },
-            dismissButton = { TextButton(onClick = { showRelease = false }) { Text("Plus tard") } }
-        )
-    }
-}
-
-@Composable private fun FoodDialog(apiKey:String,onDismiss:()->Unit,onSave:(String,Int)->Unit){
-    var name by remember{mutableStateOf("")};var kcal by remember{mutableStateOf("")};var photoUri by remember{mutableStateOf<Uri?>(null)};var busy by remember{mutableStateOf(false)};var error by remember{mutableStateOf<String?>(null)}
-    val context= LocalContext.current;val scope= rememberCoroutineScope();val picker= rememberLauncherForActivityResult(ActivityResultContracts.GetContent()){photoUri=it;error=null}
-    AlertDialog(onDismissRequest=onDismiss,title={Text("Ajouter un repas",fontWeight=FontWeight.Bold)},text={Column(verticalArrangement=Arrangement.spacedBy(9.dp)){
-        Text("Décris ton repas ou choisis une photo. L’estimation est approximative.",color=Muted,fontSize=12.sp)
-        OutlinedButton(onClick={picker.launch("image/*")},modifier=Modifier.fillMaxWidth()){Icon(Icons.Default.CameraAlt,null);Spacer(Modifier.width(8.dp));Text(if(photoUri!=null)"Photo choisie" else "Choisir une photo")}
-        OutlinedTextField(value=name,onValueChange={name=it},label={Text("Description ou nom du repas")},singleLine=true)
-        if(photoUri!=null) Button(enabled=!busy,onClick={
-            busy=true;error=null;scope.launch { try { val input=context.contentResolver.openInputStream(photoUri!!)?.use{BitmapFactory.decodeStream(it)} ?: throw IllegalStateException("Photo illisible");val scale=minOf(1f,1024f/maxOf(input.width,input.height));val bitmap=Bitmap.createScaledBitmap(input,(input.width*scale).toInt().coerceAtLeast(1),(input.height*scale).toInt().coerceAtLeast(1),true);val out=ByteArrayOutputStream();bitmap.compress(Bitmap.CompressFormat.JPEG,82,out);val result=GeminiFoodEstimator.estimate(apiKey,out.toByteArray(),name);name=result.first;kcal=result.second.toString() }catch(e:Exception){error=e.message ?: "Analyse impossible."}finally{busy=false} }
-        },modifier=Modifier.fillMaxWidth()){Text(if(busy)"Analyse en cours…" else "Analyser la photo avec Gemini")}
-        if(kcal.isNotBlank())OutlinedTextField(value=kcal,onValueChange={kcal=it.filter(Char::isDigit)},label={Text("Calories estimées")},suffix={Text("kcal")},singleLine=true)
-        error?.let{Text(it,color=MaterialTheme.colorScheme.error,fontSize=12.sp)}
-    }},confirmButton={Button(onClick={if(name.isNotBlank())onSave(name,kcal.toIntOrNull()?:450)},enabled=name.isNotBlank()&&!busy){Text("Enregistrer")}},dismissButton={TextButton(onClick=onDismiss){Text("Annuler")}})
-}
 @Composable private fun WorkoutDialog(apiKey:String,initialWeight:Int,onDismiss:()->Unit,onSave:(String,Int)->Unit){var activity by remember{mutableStateOf("Course à pied")};var minutes by remember{mutableStateOf("30")};var weight by remember{mutableStateOf(initialWeight.toString())};var description by remember{mutableStateOf("")};var estimated by remember{mutableStateOf<Int?>(null)};var sessionName by remember{mutableStateOf("")};var busy by remember{mutableStateOf(false)};var error by remember{mutableStateOf<String?>(null)};val scope=rememberCoroutineScope();val types=listOf("Course à pied","Marche rapide","Vélo","Renforcement","Natation");val met=when(activity){"Course à pied"->9.0;"Marche rapide"->4.3;"Vélo"->7.5;"Natation"->7.0;else->5.0};val kcal=estimated ?: (met*(weight.toDoubleOrNull()?:70.0)*(minutes.toDoubleOrNull()?:30.0)/60).toInt();AlertDialog(onDismissRequest=onDismiss,title={Text("Noter une séance",fontWeight=FontWeight.Bold)},text={Column(verticalArrangement=Arrangement.spacedBy(8.dp)){Text("Estimation indicative basée sur l'activité, la durée et le poids.",color=Muted,fontSize=12.sp);types.forEach{FilterChip(selected=activity==it,onClick={activity=it},label={Text(it)},leadingIcon=if(activity==it){{Icon(Icons.Default.Check,null)}}else null)};OutlinedTextField(value=minutes,onValueChange={minutes=it.filter(Char::isDigit)},label={Text("Durée")},suffix={Text("min")},singleLine=true);OutlinedTextField(value=weight,onValueChange={weight=it.filter(Char::isDigit)},label={Text("Poids")},suffix={Text("kg")},singleLine=true);OutlinedTextField(value=description,onValueChange={description=it;estimated=null},label={Text("Décris ta séance")},placeholder={Text("ex. 5 km en 30 minutes avec quelques côtes")},modifier=Modifier.fillMaxWidth());Button(enabled=!busy && description.isNotBlank(),onClick={busy=true;error=null;scope.launch{try{val result=GeminiFoodEstimator.estimateWorkout(apiKey,description,weight.toIntOrNull()?:70);sessionName=result.first;estimated=result.second}catch(e:Exception){error=e.message?:"Estimation impossible."}finally{busy=false}}},modifier=Modifier.fillMaxWidth()){Text(if(busy)"Analyse en cours…" else "Estimer avec Gemini")};error?.let{Text(it,color=MaterialTheme.colorScheme.error,fontSize=12.sp)};Text("Environ $kcal kcal dépensées",fontWeight=FontWeight.Bold,color=Ink)}},confirmButton={Button(onClick={onSave(if(sessionName.isNotBlank())sessionName else activity,kcal)},enabled=!busy){Text("Enregistrer")}},dismissButton={TextButton(onClick=onDismiss){Text("Annuler")}})}
 @Composable private fun PlanDialog(apiKey:String,age:String,weight:Int,goal:String,onDismiss:()->Unit,onSave:(String)->Unit){
     var days by remember{mutableIntStateOf(3)};var oneDay by remember{mutableStateOf(false)};var level by remember{mutableStateOf("Débutant")};var equipment by remember{mutableStateOf("Sans matériel")};var output by remember{mutableStateOf("")};var busy by remember{mutableStateOf(false)};var error by remember{mutableStateOf<String?>(null)};val scope=rememberCoroutineScope()
@@ -337,7 +257,7 @@ private fun CoachApp() {
     val titles=listOf("Ton nouveau coach","Faisons connaissance","Définis ton cap","Prêt à démarrer")
     val done={ onFinish(age,height,weight,goal,sex,activity) }
     Dialog(onDismissRequest={done()},properties=DialogProperties(usePlatformDefaultWidth=false)){
-        Box(Modifier.fillMaxSize().padding(horizontal=12.dp,vertical=16.dp).clip(RoundedCornerShape(32.dp)).background(Brush.linearGradient(listOf(Color(0xFF18252C),Color(0xFF0A1116),Color(0xFF101A20))))){
+        Box(Modifier.fillMaxSize().padding(horizontal=12.dp,vertical=16.dp).clip(RoundedCornerShape(32.dp)).background(Brush.linearGradient(listOf(PanelRaised,Paper,Panel)))){
             Column(Modifier.fillMaxSize().padding(horizontal=24.dp,vertical=22.dp),verticalArrangement=Arrangement.SpaceBetween){
                 Column {
                     Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
@@ -370,6 +290,9 @@ private fun CoachApp() {
 }
 
 @Composable private fun BalanceCard(remaining:Int, progress:Float, eaten:Int, burned:Int, target:Int) {
+    val ringTrack=Border
+    val ringPrimary=Green
+    val ringSecondary=Accent
     Card(shape=RoundedCornerShape(30.dp), colors=CardDefaults.cardColors(containerColor=Panel), border=androidx.compose.foundation.BorderStroke(1.dp,Border)) {
         Column(Modifier.fillMaxWidth().background(Brush.verticalGradient(listOf(PanelRaised,Panel))).padding(24.dp),horizontalAlignment=Alignment.CenterHorizontally) {
             Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween) {
@@ -380,8 +303,8 @@ private fun CoachApp() {
             Box(Modifier.size(212.dp),contentAlignment=Alignment.Center) {
                 androidx.compose.foundation.Canvas(Modifier.fillMaxSize().padding(9.dp)) {
                     val stroke=androidx.compose.ui.graphics.drawscope.Stroke(width=12.dp.toPx(),cap=androidx.compose.ui.graphics.StrokeCap.Round)
-                    drawArc(Border,-90f,360f,false,style=stroke)
-                    drawArc(Brush.sweepGradient(listOf(Green,Accent,Green)),-90f,360f*progress,false,style=stroke)
+                    drawArc(ringTrack,-90f,360f,false,style=stroke)
+                    drawArc(Brush.sweepGradient(listOf(ringPrimary,ringSecondary,ringPrimary)),-90f,360f*progress,false,style=stroke)
                 }
                 Column(horizontalAlignment=Alignment.CenterHorizontally) {
                     Text("$remaining",fontSize=46.sp,fontWeight=FontWeight.Light,color=Ink,letterSpacing=(-2).sp)

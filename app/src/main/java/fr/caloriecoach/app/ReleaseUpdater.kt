@@ -14,7 +14,11 @@ data class AppRelease(
 )
 
 object ReleaseUpdater {
-    suspend fun latest(repository: String): AppRelease = withContext(Dispatchers.IO) {
+    const val REPOSITORY = "zigenounoube-hue/CalorieCoach"
+
+    suspend fun latest(): AppRelease = latest(REPOSITORY)
+
+    internal suspend fun latest(repository: String): AppRelease = withContext(Dispatchers.IO) {
         val normalized = repository.trim().removePrefix("https://github.com/").trimEnd('/')
         require(Regex("^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$").matches(normalized)) {
             "Saisis le dépôt GitHub au format propriétaire/projet."
